@@ -3796,7 +3796,7 @@ P.runtime = (function() {
             R = STACK.pop();
             queue[THREAD] = undefined;
             WARP = 0;
-            while (IMMEDIATE) {
+            while (IMMEDIATE && Date.now() - start < 1000 / this.framerate) {
               var fn = IMMEDIATE;
               IMMEDIATE = null;
               fn();
