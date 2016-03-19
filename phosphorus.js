@@ -613,7 +613,7 @@ var P = (function() {
       whenSceneStarts: [],
       whenSensorGreaterThan: []
     };
-    for (var i = 0; i < 256; i++) {
+    for (var i = 0; i <= 128; i++) {
       this.listeners.whenKeyPressed.push([]);
     }
     this.fns = [];
@@ -908,15 +908,24 @@ var P = (function() {
         return;
       }
       this.keys[e.keyCode] = true;
+      this.keys[ANY] = true;
       e.stopPropagation();
       if (e.target === this.canvas) {
         e.preventDefault();
         this.trigger('whenKeyPressed', e.keyCode);
+        this.trigger('whenKeyPressed', ANY);
       }
     }.bind(this));
 
     this.root.addEventListener('keyup', function(e) {
       this.keys[e.keyCode] = false;
+      this.keys[ANY] = false;
+      for (var code in this.keys) {
+        if (this.keys[code]) {
+          this.keys[ANY] = true;
+          break;
+        }
+      }
       e.stopPropagation();
       if (e.target === this.canvas) {
         e.preventDefault();
@@ -1232,12 +1241,15 @@ var P = (function() {
     }
   };
 
+  var ANY = 128;
+
   var KEY_CODES = {
     'space': 32,
     'left arrow': 37,
     'up arrow': 38,
     'right arrow': 39,
-    'down arrow': 40
+    'down arrow': 40,
+    'any': ANY
   };
 
   var getKeyCode = function(keyName) {
