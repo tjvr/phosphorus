@@ -967,6 +967,7 @@ var P = (function() {
 
       document.addEventListener('wheel', function(e) {
         if (e.target === this.canvas) {
+          e.preventDefault();
           this.trigger('whenKeyPressed', e.deltaY < 0 ? 38 : 40);
         }
       }.bind(this));
