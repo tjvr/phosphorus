@@ -966,6 +966,7 @@ var P = (function() {
       }.bind(this));
 
       this.root.addEventListener('wheel', function(e) {
+        if (e.ctrlKey) return;
         var threads = this.trigger('whenKeyPressed', e.deltaY < 0 ? 38 : 40);
         if (threads.length) e.preventDefault();
       }.bind(this));
