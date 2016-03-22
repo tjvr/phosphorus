@@ -695,6 +695,7 @@ var P = (function() {
       }
     }
     watcher.visible = visible;
+    watcher.layout();
   };
 
   Base.prototype.showNextCostume = function() {
@@ -1825,6 +1826,12 @@ var P = (function() {
     this.visible = true;
     this.x = 0;
     this.y = 0;
+
+    this.watcher = null;
+    this.text = null;
+    this.value = null;
+    this.slider = null;
+    this.knob = null;
   };
 
   Watcher.prototype.fromJSON = function(data) {
@@ -1843,8 +1850,86 @@ var P = (function() {
     this.visible = data.visible == null ? true : data.visible;
     this.x = data.x || 0;
     this.y = data.y || 0;
+    this.layout();
 
     return this;
+  };
+
+  Watcher.prototype.layout = function() {
+    if (!this.watcher) {
+      this.watcher = document.createElement('div');
+      this.stage.root.appendChild(this.watcher);
+      this.watcher.style.position = 'absolute';
+      this.watcher.style.cursor = 'default';
+      this.watcher.style.background = 'rgb(193, 196, 199)';
+      this.watcher.style.borderRadius = '5em';
+
+      this.text = document.createElement('div');
+      this.watcher.appendChild(this.text);
+      this.text.style.font = 'bold 11em sans-serif';
+      this.text.style.margin = '0 '+(5/11)+'em 0 0';
+
+      this.value = document.createElement('div');
+      this.watcher.appendChild(this.value);
+      this.value.textContent = '';
+      this.value.style.display = 'inline-block';
+      this.value.style.textAlign = 'center';
+      this.value.style.color = '#fff';
+
+      this.slider = document.createElement('div');
+      this.watcher.appendChild(this.slider);
+      this.slider.style.border = '1em solid rgb(148, 145, 145)';
+      this.slider.style.background = 'rgb(213, 216, 219)';
+      this.slider.style.height = '3em';
+      this.slider.style.borderRadius = '1.5em';
+      this.slider.style.margin = '4em 0 2em';
+
+      this.knob = document.createElement('div');
+      this.slider.appendChild(this.knob);
+      this.knob.style.border = '1em solid rgb(108, 105, 105)';
+      this.knob.style.background = 'rgb(233, 236, 239)';
+      this.knob.style.position = 'absolute';
+      this.knob.style.width = '7em';
+      this.knob.style.height = '7em';
+      this.knob.style.bottom = '2em';
+      this.knob.style.left = '2em';
+      this.knob.style.borderRadius = '4.5em';
+    }
+
+    this.watcher.style.display = this.visible ? 'block' : 'none';
+    this.watcher.style.left = this.x + 'em';
+    this.watcher.style.top = this.y + 'em';
+    this.text.textContent = this.label;
+    this.value.style.background = this.color;
+
+    this.slider.style.display = this.mode === 3 ? 'block' : 'none';
+
+    if (this.mode === 1 || this.mode === 3) {
+      this.watcher.style.border = '1em solid rgb(148, 145, 145)';
+      this.watcher.style.padding = '2em 4em';
+
+      this.text.style.display = 'inline-block';
+
+      this.value.style.font = 'bold 11em sans-serif';
+      this.value.style.borderRadius = (4/11)+'em';
+      this.value.style.minWidth = (31/11)+'em';
+      this.value.style.padding = '0 '+(4/11)+'em';
+      this.value.style.border = (1/11)+'em solid #fff';
+      this.value.style.lineHeight = 'normal';
+
+    } else if (this.mode === 2) {
+      this.watcher.style.border = 'none';
+      this.watcher.style.padding = '0';
+
+      this.text.style.display = 'none';
+
+      this.value.style.font = 'bold 15em sans-serif';
+      this.value.style.borderRadius = (4/15)+'em';
+      this.value.style.minWidth = (31/15)+'em';
+      this.value.style.padding = '0 '+(4/15)+'em';
+      this.value.style.border = (1/15)+'em solid #fff';
+      this.value.style.lineHeight = (19/15)+'em';
+    }
   };
 
   Watcher.prototype.resolve = function() {
@@ -1902,14 +1987,20 @@ var P = (function() {
         break;
       case 'getVar:':
         value = this.target.vars[this.param];
-        if (this.mode === 3 && this.stage.mousePressed) {
-          var x = this.stage.mouseX + 240 - this.x - 5;
-          var y = 180 - this.stage.mouseY - this.y - 20;
-          if (x >= 0 && y >= 0 && x <= this.width - 5 - 5 && y <= 9) {
-            value = this.sliderMin + Math.max(0, Math.min(1, (x - 2.5) / (this.width - 5 - 5 - 5))) * (this.sliderMax - this.sliderMin);
-            value = this.isDiscrete ? Math.round(value) : Math.round(value * 100) / 100;
-            this.target.vars[this.param] = value;
+        if (this.mode === 3) {
+          var width = this.watcher.clientWidth;
+          if (this.stage.mousePressed) {
+            var x = this.stage.mouseX + 240 - this.x - 5;
+            var y = 180 - this.stage.mouseY - this.y - 20;
+            if (x >= 0 && y >= 0 && x <= width - 5 - 5 && y <= 9) {
+              value = this.sliderMin + Math.max(0, Math.min(1, (x - 2.5) / (width - 5 - 5 - 5))) * (this.sliderMax - this.sliderMin);
+              value = this.isDiscrete ? Math.round(value) : Math.round(value * 100) / 100;
+              this.target.vars[this.param] = value;
+            }
           }
+
+          var f = (value - this.sliderMin) / (this.sliderMax - this.sliderMin);
+          this.knob.style.left = (2 + f*(width - 13))+'px';
         }
         break;
       case 'heading':
@@ -1949,121 +2040,7 @@ var P = (function() {
     if (typeof value === 'number' && (value < 0.001 || value > 0.001)) {
       value = Math.round(value * 1000) / 1000;
     }
-    value = '' + value;
-
-    if (this.labelWidth == null) {
-      context.font = 'bold 11px sans-serif';
-      this.labelWidth = context.measureText(this.label).width;
-    }
-
-    context.save();
-    context.translate(this.x, this.y);
-
-    if (this.mode === 1 || this.mode === 3) {
-      context.font = 'bold 11px sans-serif';
-
-      var dw = Math.max(41, 5 + context.measureText(value).width + 5);
-      var r = 5;
-      var w = this.width = 5 + this.labelWidth + 5 + dw + 5;
-      var h = this.mode === 1 ? 21 : 32;
-
-      context.strokeStyle = 'rgb(148, 145, 145)';
-      context.fillStyle = 'rgb(193, 196, 199)';
-      context.lineWidth = 2;
-      context.beginPath();
-      context.arc(r + 1, r + 1, r, Math.PI, Math.PI * 3/2, false);
-      context.arc(w - r - 1, r + 1, r, Math.PI * 3/2, 0, false);
-      context.arc(w - r - 1, h - r - 1, r, 0, Math.PI/2, false);
-      context.arc(r + 1, h - r - 1, r, Math.PI/2, Math.PI, false);
-      context.closePath();
-      context.stroke();
-      context.fill();
-
-      context.fillStyle = '#000';
-      context.fillText(this.label, 5, 14);
-
-      var dh = 15;
-      var dx = 5 + this.labelWidth + 5;
-      var dy = 3;
-      var dr = 4;
-
-      context.save();
-      context.translate(dx, dy);
-
-      context.strokeStyle = '#fff';
-      context.fillStyle = this.color;
-      context.lineWidth = 2;
-      context.beginPath();
-      context.arc(dr + 1, dr + 1, dr, Math.PI, Math.PI * 3/2, false);
-      context.arc(dw - dr - 1, dr + 1, dr, Math.PI * 3/2, 0, false);
-      context.arc(dw - dr - 1, dh - dr - 1, dr, 0, Math.PI/2, false);
-      context.arc(dr + 1, dh - dr - 1, dr, Math.PI/2, Math.PI, false);
-      context.closePath();
-      context.stroke();
-      context.fill();
-
-      context.fillStyle = '#fff';
-      context.textAlign = 'center';
-      context.fillText(value, dw / 2, dh - 4);
-
-      context.restore();
-
-      if (this.mode === 3) {
-        var sh = 5;
-        var sw = w - 5 - 5;
-        var sr = 1.5;
-        var br = 4.5;
-
-        context.save();
-        context.translate(5, 22);
-
-        context.strokeStyle = 'rgb(148, 145, 145)';
-        context.fillStyle = 'rgb(213, 216, 219)';
-        context.lineWidth = 2;
-        context.beginPath();
-        context.arc(sr + 1, sr + 1, sr, Math.PI, Math.PI * 3/2, false);
-        context.arc(sw - sr - 1, sr + 1, sr, Math.PI * 3/2, 0, false);
-        context.arc(sw - sr - 1, sh - sr - 1, sr, 0, Math.PI/2, false);
-        context.arc(sr + 1, sh - sr - 1, sr, Math.PI/2, Math.PI, false);
-        context.closePath();
-        context.stroke();
-        context.fill();
-
-        var x = (sw - sh) * Math.max(0, Math.min(1, ((+value || 0) - this.sliderMin) / (this.sliderMax - this.sliderMin)));
-        context.strokeStyle = 'rgb(108, 105, 105)';
-        context.fillStyle = 'rgb(233, 236, 239)';
-        context.beginPath();
-        context.arc(x + sh / 2, sh / 2, br - 1, 0, Math.PI * 2, false);
-        context.stroke();
-        context.fill();
-
-        context.restore();
-      }
-    } else if (this.mode === 2) {
-      context.font = 'bold 15px sans-serif';
-
-      dh = 21;
-      dw = Math.max(41, 5 + context.measureText(value).width + 5);
-      dr = 4;
-
-      context.strokeStyle = '#fff';
-      context.fillStyle = this.color;
-      context.lineWidth = 2;
-      context.beginPath();
-      context.arc(dr + 1, dr + 1, dr, Math.PI, Math.PI * 3/2, false);
-      context.arc(dw - dr - 1, dr + 1, dr, Math.PI * 3/2, 0, false);
-      context.arc(dw - dr - 1, dh - dr - 1, dr, 0, Math.PI/2, false);
-      context.arc(dr + 1, dh - dr - 1, dr, Math.PI/2, Math.PI, false);
-      context.closePath();
-      context.stroke();
-      context.fill();
-
-      context.fillStyle = '#fff';
-      context.textAlign = 'center';
-      context.fillText(value, dw / 2, dh - 5);
-    }
-
-    context.restore();
+    this.value.textContent = value + '\u200c';
   };
 
   var AudioContext = window.AudioContext || window.webkitAudioContext;
