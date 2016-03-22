@@ -981,6 +981,7 @@ var P = (function() {
     this.prompter.style.borderRadius = '8em';
     this.prompter.style.background = '#fff';
     this.prompter.style.display = 'none';
+    this.prompter.style.zIndex = '1';
 
     this.promptTitle = document.createElement('div');
     this.prompter.appendChild(this.promptTitle);
