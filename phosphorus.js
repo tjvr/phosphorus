@@ -1707,11 +1707,10 @@ var P = (function() {
       this.bubblePointer.style.width = ''+(44/14)+'em';
       this.bubblePointer.style.background = 'url(icons.svg) '+(-195/14)+'em '+(-4/14)+'em';
       this.bubblePointer.style.backgroundSize = ''+(320/14)+'em '+(96/14)+'em';
-      this.stage.root.appendChild(this.bubble);
     } else {
       this.stage.root.removeChild(this.bubble);
-      this.stage.root.appendChild(this.bubble);
     }
+    this.stage.root.appendChild(this.bubble);
     this.bubblePointer.style.backgroundPositionX = ((thinking ? -259 : -195)/14)+'em';
     this.bubble.style.display = 'block';
     this.bubbleText.nodeValue = text;
