@@ -1989,7 +1989,7 @@ var P = (function() {
       case 'getVar:':
         value = this.target.vars[this.param];
         if (this.mode === 3) {
-          var width = this.watcher.clientWidth;
+          var width = this.watcher.clientWidth / this.stage.zoom;
           if (this.stage.mousePressed) {
             var x = this.stage.mouseX + 240 - this.x - 5;
             var y = 180 - this.stage.mouseY - this.y - 20;
@@ -2001,7 +2001,7 @@ var P = (function() {
           }
 
           var f = (value - this.sliderMin) / (this.sliderMax - this.sliderMin);
-          this.knob.style.left = (2 + f*(width - 13))+'px';
+          this.knob.style.left = (2 + f*(width - 13))+'em';
         }
         break;
       case 'heading':
