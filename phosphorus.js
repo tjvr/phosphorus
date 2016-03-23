@@ -329,12 +329,12 @@ var P = (function() {
     return request;
   };
 
-  IO.loadSB2Project = function(ab, callback, self) {
+  IO.loadSB2Object = function(zip, callback, self) {
     var request = new CompositeRequest;
     IO.init(request);
 
     try {
-      IO.zip = new JSZip(ab);
+      IO.zip = zip;
       var json = IO.parseJSONish(IO.zip.file('project.json').asText());
 
       IO.loadProject(json);
@@ -352,6 +352,26 @@ var P = (function() {
     }
 
     return request;
+  };
+
+  IO.loadSB2Project = function(ab, callback, self) {
+    var cr = new CompositeRequest;
+    try {
+      var zip = new JSZip(ab);
+
+      cr.defer = true;
+      cr.add(IO.loadSB2Object(zip, function(result) {
+        cr.defer = false;
+        cr.getResult = function() {
+          return result;
+        };
+        cr.update();
+      }));
+    } catch (e) {
+      cr.error(e);
+    }
+    if (callback) cr.onLoad(callback.bind(self));
+    return cr;
   };
 
   IO.loadSB2File = function(f, callback, self) {
