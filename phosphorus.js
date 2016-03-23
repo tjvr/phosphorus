@@ -1869,6 +1869,8 @@ var P = (function() {
       this.watcher.appendChild(this.text);
       this.text.style.font = 'bold 11em sans-serif';
       this.text.style.margin = '0 '+(5/11)+'em 0 0';
+      this.text.style.verticalAlign = 'top';
+      this.text.style.lineHeight = (15/11)+'em';
 
       this.value = document.createElement('div');
       this.watcher.appendChild(this.value);
@@ -1916,7 +1918,8 @@ var P = (function() {
       this.value.style.minWidth = (31/11)+'em';
       this.value.style.padding = '0 '+(4/11)+'em';
       this.value.style.border = (1/11)+'em solid #fff';
-      this.value.style.lineHeight = 'normal';
+      this.value.style.height = (13/11)+'em';
+      this.value.style.lineHeight = (13/11)+'em';
 
     } else if (this.mode === 2) {
       this.watcher.style.border = 'none';
@@ -1929,6 +1932,7 @@ var P = (function() {
       this.value.style.minWidth = (31/15)+'em';
       this.value.style.padding = '0 '+(4/15)+'em';
       this.value.style.border = (1/15)+'em solid #fff';
+      this.value.style.height = (19/15)+'em';
       this.value.style.lineHeight = (19/15)+'em';
     }
   };
@@ -2041,7 +2045,7 @@ var P = (function() {
     if (typeof value === 'number' && (value < 0.001 || value > 0.001)) {
       value = Math.round(value * 1000) / 1000;
     }
-    this.value.textContent = value + '\u200c';
+    this.value.textContent = value + '';
   };
 
   var AudioContext = window.AudioContext || window.webkitAudioContext;
