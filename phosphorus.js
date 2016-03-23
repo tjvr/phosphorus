@@ -1896,7 +1896,7 @@ var P = (function() {
       this.knob.style.height = '7em';
       this.knob.style.bottom = '2em';
       this.knob.style.left = '2em';
-      this.knob.style.borderRadius = '4.5em';
+      this.knob.style.borderRadius = '5em';
     }
 
     this.watcher.style.display = this.visible ? 'block' : 'none';
