@@ -399,6 +399,23 @@ var P = (function() {
     return cr;
   };
 
+  IO.loadSB2fromTosh = function(zip, callback, self) {
+    var cr = new CompositeRequest;
+    cr.defer = true;
+    var request = new Request;
+    cr.add(request);
+    cr.add(IO.loadSB2Object(zip, function(result) {
+      cr.defer = false;
+      cr.getResult = function() {
+        return result;
+      };
+      cr.update();
+    }));
+    request.load();
+    if (callback) cr.onLoad(callback.bind(self));
+    return cr;
+  };
+
   IO.loadProject = function(data) {
     IO.loadWavs();
     IO.loadArray(data.children, IO.loadObject);
