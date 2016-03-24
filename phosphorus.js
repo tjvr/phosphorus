@@ -1885,7 +1885,10 @@ var P = (function() {
       this.slider.style.background = 'rgb(213, 216, 219)';
       this.slider.style.height = '3em';
       this.slider.style.borderRadius = '1.5em';
-      this.slider.style.margin = '4em 0 2em';
+      this.slider.style.position = 'absolute';
+      this.slider.style.left = '4em';
+      this.slider.style.right = '4em';
+      this.slider.style.bottom = '4em';
 
       this.knob = document.createElement('div');
       this.slider.appendChild(this.knob);
@@ -1894,7 +1897,7 @@ var P = (function() {
       this.knob.style.position = 'absolute';
       this.knob.style.width = '7em';
       this.knob.style.height = '7em';
-      this.knob.style.bottom = '2em';
+      this.knob.style.bottom = '-3em';
       this.knob.style.left = '2em';
       this.knob.style.borderRadius = '5em';
     }
@@ -1910,6 +1913,7 @@ var P = (function() {
     if (this.mode === 1 || this.mode === 3) {
       this.watcher.style.border = '1em solid rgb(148, 145, 145)';
       this.watcher.style.padding = '2em 4em';
+      this.watcher.style.height = this.mode === 1 ? '15em' : '26em';
 
       this.text.style.display = 'inline-block';
 
@@ -1924,6 +1928,7 @@ var P = (function() {
     } else if (this.mode === 2) {
       this.watcher.style.border = 'none';
       this.watcher.style.padding = '0';
+      this.watcher.style.height = '21em';
 
       this.text.style.display = 'none';
 
@@ -2005,7 +2010,7 @@ var P = (function() {
           }
 
           var f = (value - this.sliderMin) / (this.sliderMax - this.sliderMin);
-          this.knob.style.left = (2 + f*(width - 13))+'em';
+          this.knob.style.left = (-3 + f*(width - 13))+'em';
         }
         break;
       case 'heading':
